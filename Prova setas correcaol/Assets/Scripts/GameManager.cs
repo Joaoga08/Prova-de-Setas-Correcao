@@ -4,10 +4,28 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
     int pontos, teclaAtual;
     float relogio;
     KeyCode[] teclas;
+    private KeyCode[] direcoes = {KeyCode.DownArrow,KeyCode.LeftArrow,KeyCode.UpArrow,KeyCode.RightArrow};
 
+
+
+
+    private void Awake()
+    {
+        if(Instance != null && Instance != this)
+        {
+
+          Destroy(gameObject);
+
+            return;
+        }
+
+        Instance = this;
+DontDestroyOnLoad(gameObject);
+    }
     private void Start()
     {
         GerarSetas();
@@ -15,21 +33,14 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+       foreach(KeyCode direcao in direcoes)
         {
-            ChecarTecla(KeyCode.DownArrow);
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            ChecarTecla(KeyCode.LeftArrow);
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            ChecarTecla(KeyCode.UpArrow);
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            ChecarTecla(KeyCode.RightArrow);
+
+            if (Input.GetKeyDown(direcao))
+            {
+                ChecarTecla(direcao);
+                break;
+            }
         }
 
         ContagemRegressiva();
