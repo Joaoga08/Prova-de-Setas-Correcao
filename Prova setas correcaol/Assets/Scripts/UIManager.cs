@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -13,34 +13,41 @@ public class UIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI textoDePontuacao;
     [SerializeField] TextMeshProUGUI textoDoRelogio;
 
+    // Delegate para atualizar as setas
+    public delegate Sprite AtualizarSetaDelegate(KeyCode key);
+
+    // Função que define a lógica padrão para atualizar as setas
+    private Sprite DefaultAtualizarSeta(KeyCode key)
+    {
+        if (key == KeyCode.DownArrow) return sprites[1];
+        if (key == KeyCode.UpArrow) return sprites[2];
+        if (key == KeyCode.LeftArrow) return sprites[3];
+        if (key == KeyCode.RightArrow) return sprites[4];
+        return sprites[0];
+    }
+
     private void Awake()
     {
         instance = this;
     }
 
-    public void AtualizarSetas(KeyCode[] setas)
+    public void AtualizarSetas(KeyCode[] setas, AtualizarSetaDelegate atualizarSetaCallback = null)
     {
+        // Usa a lógica padrão se nenhum delegate for passado
+        if (atualizarSetaCallback == null)
+        {
+            atualizarSetaCallback = DefaultAtualizarSeta;
+        }
+
         for (int i = 0; i < imagens.Length; i++)
         {
             if (i >= setas.Length)
             {
                 imagens[i].sprite = sprites[0];
             }
-            else if (setas[i] == KeyCode.DownArrow)
+            else
             {
-                imagens[i].sprite = sprites[1];
-            }
-            else if (setas[i] == KeyCode.UpArrow)
-            {
-                imagens[i].sprite = sprites[2];
-            }
-            else if (setas[i] == KeyCode.LeftArrow)
-            {
-                imagens[i].sprite = sprites[3];
-            }
-            else if (setas[i] == KeyCode.RightArrow)
-            {
-                imagens[i].sprite = sprites[4];
+                imagens[i].sprite = atualizarSetaCallback(setas[i]);
             }
 
             imagens[i].color = Color.white;
@@ -49,14 +56,7 @@ public class UIManager : MonoBehaviour
 
     public void AtualizarSeta(int setaSelecionada, bool acertou)
     {
-        if (acertou)
-        {
-            imagens[setaSelecionada].color = Color.green;
-        }
-        else
-        {
-            imagens[setaSelecionada].color = Color.red;
-        }
+        imagens[setaSelecionada].color = acertou ? Color.green : Color.red;
     }
 
     public void AtualizarTextos(int pontuacao, float relogio)
